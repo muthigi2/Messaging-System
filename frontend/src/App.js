@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import config from './config';
 import './App.css';
 
@@ -11,6 +11,23 @@ function App() {
   const [submitting, setSubmitting] = useState(false);
   const ws = useRef(null);
   const lastMsgKeyRef = useRef('');
+
+  // Hydrate messages from localStorage on initial load
+  useEffect(() => {
+    try {
+      const cached = JSON.parse(localStorage.getItem('recentMessages') || '[]');
+      if (Array.isArray(cached) && cached.length) {
+        setMessages(cached);
+      }
+    } catch {}
+  }, []);
+
+  // Persist messages to localStorage whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem('recentMessages', JSON.stringify(messages.slice(0, config.MAX_MESSAGES)));
+    } catch {}
+  }, [messages]);
 
   useEffect(() => {
     let reconnectTimeout;
@@ -396,6 +413,7 @@ async function resetCounters(setHistory, setMessages, clearKey) {
   setHistory([]);
   if (typeof setMessages === 'function') setMessages([]);
   if (typeof clearKey === 'function') clearKey();
+  try { localStorage.removeItem('recentMessages'); } catch {}
 }
 
 export default App; 
