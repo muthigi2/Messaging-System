@@ -29,6 +29,17 @@ function App() {
     } catch {}
   }, [messages]);
 
+  // Also persist right before page unload as a safety net
+  useEffect(() => {
+    const handler = () => {
+      try {
+        localStorage.setItem('recentMessages', JSON.stringify(messages.slice(0, config.MAX_MESSAGES)));
+      } catch {}
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [messages]);
+
   useEffect(() => {
     let reconnectTimeout;
     let isConnecting = false;
@@ -317,7 +328,6 @@ function App() {
                 <span className="timestamp">
                   {new Date(Number(msg.timestamp)).toLocaleTimeString()}
                 </span>
-                <span className="source">{msg.source}</span>
               </div>
             ))}
           </div>
