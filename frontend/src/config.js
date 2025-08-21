@@ -1,9 +1,28 @@
+// Build-time configurable endpoints (Render/Netlify can set these)
+const ENV_API = process.env.REACT_APP_API_URL;
+const ENV_WS = process.env.REACT_APP_WS_URL;
+
+// Derive WS from API if only API is provided
+const deriveWsFromApi = (api) => {
+    if (!api) return null;
+    try {
+        // Replace http -> ws, strip trailing /api -> /ws
+        const ws = api.replace(/^http/, 'ws').replace(/\/api\/?$/, '/ws');
+        return ws;
+    } catch {
+        return null;
+    }
+};
+
+const RESOLVED_API = ENV_API || 'http://localhost:8080/api';
+const RESOLVED_WS = ENV_WS || deriveWsFromApi(ENV_API) || 'ws://localhost:8080/ws';
+
 const config = {
     // WebSocket server URL
-    WS_URL: 'ws://localhost:8080/ws',
+    WS_URL: RESOLVED_WS,
     
     // HTTP API server URL
-    API_URL: 'http://localhost:8080/api',
+    API_URL: RESOLVED_API,
     
     // Stats polling interval in milliseconds
     POLL_INTERVAL: 250,
