@@ -1,0 +1,10 @@
+backend/build/
+**/build/
+**/cmake-build*/
+**/*.o
+**/*.a
+frontend/node_modules/
+frontend/.cache/
+frontend/build/
+.vscode/
+.DS_Store
